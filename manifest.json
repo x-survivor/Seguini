@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Youtube Video TimelinePin",
+    "version": "1.0.0",
+    "description": "A Chrome extension that allows you to pin videos on the timeline.",
+    "background":{
+        "service_worker": "script/background.js"
+    },
+    "action":{
+        "default_popup": "popup.html"
+    },
+    "content_scripts":[{
+        "matches": ["*://www.youtube.com/watch*"],
+        "js": ["script/contentScript.js"],
+        "css": ["style/contentCss.css"]
+    }],
+    "permissions": ["activeTab", "scripting", "storage"],
+    "host_permissions": ["*://www.youtube.com/*"]
+}
