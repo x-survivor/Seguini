@@ -1,14 +1,14 @@
 let url = window.location.href;
-let cookie_name = new URL(url).searchParams.get("id") || "default_cookie";
-let video = null;
+let cookie_name = url.split("=")[1];
+let localChromeStorage = chrome.storage.local;
+let video;
 
 // MutationObserver to detect video element
 const observer = new MutationObserver(() => {
   video = document.querySelector("video");
   if (video) {
-    observer.disconnect(); // Stop observing once video is found
     url = window.location.href;
-    cookie_name = new URL(url).searchParams.get("id") || "default_cookie";
+    cookie_name = url.split("=")[1];
     initializeVideoState();
   }
 });
@@ -18,18 +18,9 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 // Function to initialize video state from cookies
 async function initializeVideoState() {
-  let cookieData = retrieveCookie(cookie_name);
-  if (cookieData) {
-    try {
-      let savedState = JSON.parse(decodeURIComponent(cookieData));
-      if (savedState && savedState.currentVideoTime) {
-        video.currentTime = savedState.currentVideoTime;
-      }
-    } catch (error) {
-      console.error("Error parsing cookie data:", error);
-    }
-  }
-
+  localChromeStorage.get([cookie_name]).then((data)=>{
+    console.log(data);
+  });
   // Periodically save video progress
   setInterval(saveVideoProgress, 10000);
 }
@@ -41,12 +32,20 @@ function saveVideoProgress() {
       url: url,
       currentVideoTime: video.currentTime,
     };
-    let cookieData = retrieveCookie(cookie_name);
     setcookie(cookie_name, JSON.stringify(object));
+    let cookieData = retrieveCookie(cookie_name);
     console.log(JSON.parse(decodeURIComponent(cookieData)));
+    chrome.storage.local.set({ [cookie_name]: object }).then(() => {});
   }
 }
 
+//Send data to Popup script
+function sendData(cookie_name) {
+  chrome.runtime.sendMessage({
+    action: "sendData",
+    data: cookie_name,
+  });
+}
 // Function to set a cookie
 function setcookie(name, value) {
   document.cookie = `${name}=${encodeURIComponent(value)}; path=/;`;
