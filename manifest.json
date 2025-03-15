@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Youtube Video TimelinePin",
+    "name": "YouSave",
     "version": "1.0.0",
-    "description": "A Chrome extension that allows you to pin videos on the timeline.",
+    "description": "A useful chrome extension that auto Timestamp Youtube videos and play the video from saved timestamp.",
     "action":{
         "default_popup": "popup.html"
     },
