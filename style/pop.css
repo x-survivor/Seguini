@@ -18,6 +18,21 @@
     text-align: center;
     text-transform: uppercase;
 }
+#searchContainer{
+    width: calc(100%-5px);
+    padding: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.301);
+    border-radius: 25px;
+    margin: 15px 0;
+}
+#searchContainer:focus-within{
+    border-color: black;
+}
+#search{
+    width: 83%;
+    outline: none;
+    border: none;
+}
 #itemContainer{
     margin: 15px 0;
 }

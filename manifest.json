@@ -7,7 +7,7 @@
         "default_popup": "popup.html"
     },
     "content_scripts":[{
-        "matches": ["*://www.youtube.com/watch*"],
+        "matches": ["*://www.youtube.com/*"],
         "js": ["script/contentScript.js"],
         "css": ["style/contentCss.css"],
         "type": "module"
