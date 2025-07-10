@@ -77,6 +77,8 @@ function getVideo() {
   video = document.querySelector("video");
   return video;
 }
+
 function getKey() {
-  return window.location.href.split("=")[1];
+  return location.href.split("=")[1];
 }
+
