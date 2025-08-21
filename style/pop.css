@@ -1,90 +1,194 @@
-*{
-    margin: 0;
+* {
+  margin: 0;
+  height: fit-content;
 }
-.container{
-    padding: 0 10px;
-    width: 300px;
-    max-height: 400px;
-    overflow-y: scroll;
-    scrollbar-width: 10px;
+/* Popup Container */
+.container {
+  padding: 0 10px;
+  width: 300px;
+  height: fit-content;
+  max-height: 600px;
+  overflow-y: scroll;
+  background: var(--background);
 }
-.container::-webkit-scrollbar{
-    display: none;
+.container::-webkit-scrollbar {
+  display: none;
 }
-#currentVideoSave{
-    margin: 15px 0;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    text-transform: uppercase;
+
+/* Custom Scroll Bar */
+::-webkit-scrollbar{
+  width: 5px;
 }
-.searchContainer{
-    width: calc(100%-5px);
-    padding: 5px;
-    border: 1px solid rgba(0, 0, 0, 0.301);
-    border-radius: 25px;
-    margin: 15px 0;
+::-webkit-scrollbar-track{
+  background: var(--background);
 }
-.searchContainer:focus-within{
-    border-color: rgba(44, 202, 84, 0);
+::-webkit-scrollbar-thumb{
+  background: var(--foreground);
+  border-radius: 25px;
 }
-.searchbar{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+
+/* Header */
+.header {
+  margin: 15px 0;
 }
-#searchContainer{
-    background-color: rgba(203, 255, 206, 0.897);
-    border: 3px solid rgba(203, 255, 206, 0.897);
-    border-radius: 25px;
+.deleteAll{
+  background: var(--delete-all-background);
+  border: 1px solid var(--red);
+  border-radius: 7px;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--red);
 }
-#search{
-    width: 83%;
-    outline: none;
-    border: none;
+.deleteAll:hover {
+  background: rgb(250, 194, 194, 0.5);
+  color: var(--light-red);
+  border: 1px solid var(--light-red);
 }
-#searchIcon{
-    width: 17%;
-    display: flex;
-    justify-content: end;
-    align-items: center;
-    padding: 0 5px;
+.deleteAll svg path {
+  stroke: var(--red);
 }
-#itemContainer{
-    margin: 15px 0;
+.deleteAll:hover svg path {
+  stroke: var(--light-red);
 }
-.item{
-    margin: 10px 0;
-    display: flex;
-    padding: 15px;
-    box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.3); 
-    border-radius: 25px;
-    transition: 2s ease-out;
-    background-color: white;
+#currentVideoSave p {
+  font-size: 0.75rem;
 }
-.item div{
-    width: 50%;
+
+/* Display Current Playing Video */
+.currentVideoContainer {
+  width: 100%;
+  height: fit-content;
+  max-height: 150px;
+  border-radius: 10px;
+  background: var(--current-video-container);
 }
-.item div:not(:first-child){
-    display: flex;
-    justify-content: end;
-    align-items: center;
+.redDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--red);
+  animation: blink 1s infinite alternate;
 }
-.stamp{
-    font-weight: bold;
+@keyframes blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.3;
+  }
 }
-.deleteBtn{
-    background: rgb(202, 40, 40);
-    color: rgb(255, 255, 255);
-    border: none;
-    padding: 5px;
-    border-radius: 25px;
-    cursor: pointer;
+
+/* Search Input Element */
+.searchInputContainer {
+  width: calc(100%-5px);
+  padding: 5px;
+  border: 1px solid var(--foreground);
+  border-radius: 25px;
+  margin: 15px 0;
 }
-.deleteBtn:active{
-    padding: 0px;
+.searchInputContainer:focus-within {
+  border-color: var(--background);
 }
-.deleteBtn svg{
-    width: 20px;
-    height: 20px;
+#search {
+  width: 83%;
+  outline: none;
+  border: none;
+}
+#searchIcon {
+  width: 17%;
+  padding: 0 5px;
+}
+
+/* Search Container */
+#searchContainer {
+  width: calc(100% - 5px);
+  display: none;
+}
+
+/* Item Card */
+.itemsView {
+  height: 250px;
+  overflow-y: scroll;
+  margin-bottom: 15px;
+}
+#itemContainer {
+  width: calc(100% - 5px);
+  margin: 15px 0;
+}
+.item {
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  gap: 10px;
+  box-shadow: 1px 2px 5px var(--box-shadows);
+  border-radius: 15px;
+  transition: 2s ease-out;
+  background-color: var(--item-background);
+}
+.itemRecord {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.timeStamp {
+  width: fit-content;
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: var(--timeStamp-background);
+  color: var(--timeStamp-text-color);
+}
+.itemBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+.playBtn {
+  background: none;
+  border: none;
+}
+.playBtn:hover {
+  background: var(--playBtn-hover);
+  color: rgb(255, 255, 255);
+}
+.deleteSVG path {
+  stroke: black;
+  stroke-width: 1.5px;
+}
+.deleteBtn svg,
+.playBtn svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: #000;
+  stroke-width: 12;
+}
+.deleteBtn:active svg path,
+.playBtn:active svg path {
+  stroke: transparent;
+  stroke-width: 0px;
+}
+
+/* Pagination */
+#pagination {
+  display: none;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+  width: 100%;
+}
+.pageBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  border: none;
+  cursor: pointer;
+}
+#pagination button {
+  flex-grow: 1;
+  color: black;
 }

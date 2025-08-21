@@ -1,7 +1,11 @@
-const itemsContainer = document.getElementById("itemContainer");
-const currendVideoSave = document.getElementById("currentVideoSave");
-const searchBar = document.getElementById("search");
-const searchContainer = document.getElementById("searchContainer");
+import { pagination } from "./pagination.js";
+import {
+  itemsContainer,
+  currentVideoSave,
+  paginationContainer,
+  videoTitle,
+  timeStampContainer,
+} from "./util.js";
 
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   if (tabs.length === 0) return;
@@ -11,7 +15,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   if (tabs[0].url.includes("://www.youtube.com/watch?v")) {
     chrome.tabs.sendMessage(tabs[0].id, { action: "getData" }, (response) => {
       let key = response.data;
-      (!key) ? chrome.tabs.reload(tabs[0].id) : null;
+      !key ? chrome.tabs.reload(tabs[0].id) : null;
       if (chrome.runtime.lastError) {
         console.error("Error:", chrome.runtime.lastError.message);
         return;
@@ -20,118 +24,55 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     });
   } else {
     if (tabs[0].url.includes("://www.youtube.com")) {
-      currendVideoSave.innerText = "Play a Video";
+      currentVideoSave.innerText = "Play a Video";
     } else {
-      currendVideoSave.innerText = "Not a youtube video tab";
+      currentVideoSave.innerText = "Not a youtube video tab";
+      document.querySelector(".itemsView").style.display = "none";
     }
   }
 });
 
-const deleteTime = (id, container) => {
-  let articleID = id + container.id + "125";
-  let item = document.getElementById(articleID);
-  chrome.storage.local.remove([id], function () {
-    if (item && container.contains(item)) {
-      item.style.transform = `translateX(100px)`;
-      item.remove();
-    }
-    return "success";
-  });
-}
-const deleteHandler = (container) => (event) => {
-  let deleteBtn = event.target.closest(".deleteBtn");
-  if (deleteBtn) {
-    let itemID = deleteBtn.getAttribute("id");
-    deleteTime(itemID, container);
-  }
-}
-
-const itemTempale = (id, details, container) => {
-  let articleID = id + container.id + "125";
-  container.innerHTML += `
-  <article class=${"item"} id=${articleID}>
-    <div>
-      <label class=${"title"}>${details.title
-    }</label> 
-      <br> 
-      <label class=${"stamp"}> ${Math.floor(
-      details.currentVideoTime / 60
-    )} : ${(details.currentVideoTime % 60).toFixed(
-      0
-    )}</label> 
-    </div>
-    <div>
-      <button class=${"deleteBtn"} id=${id}>
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000">
-        <g id="SVGRepo_bgCarrier" stroke-width="1"></g>
-        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-        <g id="SVGRepo_iconCarrier"> <path d="M10 11V17" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-          <path d="M14 11V17" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-          <path d="M4 7H20" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-          <path d="M6 7H12H18V18C18 19.6569 16.6569 21 15 21H9C7.34315 21 6 19.6569 6 18V7Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
-          <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
-        </g>
-      </svg>
-      </button>
-    </div>
-  </article>`;
-}
-
-const fetch = (key = null, search = null) => {
+const fetch = async (key = null) => {
   if (key) {
     chrome.storage.local.get([key][0]).then((result) => {
-      if (result[key[0]]) {
-        currentVideoSave.innerHTML =
-          "<div> <label> " +
-          result[key[0]]["title"] +
-          " " +
-          Math.floor(result[key[0]]["currentVideoTime"] / 60) +
-          ":" +
-          (result[key[0]]["currentVideoTime"] % 60).toFixed(0) +
-          "</label></div><br>";
+      const data = result[key[0]];
+      if (data) {
+        let hours = Math.floor(data["currentVideoTime"] / 3600);
+        let minutes = Math.floor((data["currentVideoTime"] % 3600) / 60);
+        let seconds = Math.floor(data["currentVideoTime"] % 60);
+        const currentTimeStamp = `<div class="timeStamp" style="color: white;">
+        ${hours ? hours + ":" : ""}
+        ${minutes < 10 ? "0" + minutes : minutes}:
+        ${seconds < 10 ? "0" + seconds : seconds}
+        </div>`;
+        videoTitle.textContent = `${data["title"]} - ${data["channel_name"]}`;
+        timeStampContainer.innerHTML = currentTimeStamp;
       } else {
-        currendVideoSave.innerText = key;
+        videoTitle.textContent = key;
+      }
+    });
+  } else {
+    // Fetch all data from storage
+    const entries = Object.entries(await chrome.storage.local.get(null));
+    pagination(itemsContainer, paginationContainer, entries);
+
+    searchContainer.addEventListener("click", async (event) => {
+      const deleteBtn = event.target.closest(".deleteBtn");
+      if (deleteBtn) {
+        const entryId = deleteBtn.getAttribute("id");
+
+        // Remove from entries array
+        const index = entries.findIndex(([id]) => id === entryId);
+        if (index !== -1) {
+          entries.splice(index, 1);
+          // Re-render items
+          printDataItems(count, limit, entries, itemsContainer);
+        }
       }
     });
   }
-  else {
-    chrome.storage.local.get(null).then((data) => {
-      let count = 1
-      let limit = 4
-      Object.entries(data).forEach(([id, details]) => {
-        if (count == limit) {
-          console.log(count, limit)
-        }
-        else {
-          if (search == null) {
-            itemTempale(id, details, itemsContainer);
-          }
-          else {
-            if (details.title.toLowerCase().includes(search) || details["channel_name"].toLowerCase().includes(search)) {
-              itemTempale(id, details, searchContainer);
-            }
-          }
-        }
-      });
-    });
-  }
-}
+};
 
-function piggybag(value) {
-  value = value.toLowerCase();
-  searchContainer.innerHTML = '';
-  fetch(null, value);
-}
-searchBar.addEventListener("input", (e) => {
-  let value = e.target.value;
-  if (value == '') {
-    searchContainer.innerHTML = '';
-  }
-  else {
-    piggybag(value);
-  }
+document.querySelector(".toggleMode").addEventListener("click", () => {
+  document.getElementsByTagName("html")[0].classList.toggle("dark");
 });
-
-itemsContainer.addEventListener("click", deleteHandler(itemsContainer));
-searchContainer.addEventListener("click", deleteHandler(searchContainer));
-

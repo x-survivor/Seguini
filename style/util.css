@@ -1,0 +1,46 @@
+button {
+  background: var(--button-color);
+  border: none;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+button:hover {
+  background: rgba(0, 0, 0, 0.2);
+  color: rgb(255, 255, 255);
+}
+button:active {
+  background: none;
+  color: none;
+}
+button svg {
+  width: 20px;
+  width: 20px;
+}
+button:hover svg path {
+  stroke: var(--background);
+  fill: none;
+}
+
+.w-50 {
+  width: 50%;
+}
+.block {
+  display: block !important;
+}
+
+.flex {
+  display: flex;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-end {
+  justify-content: end;
+}
+.flex-column {
+  flex-direction: column;
+}
